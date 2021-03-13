@@ -1,0 +1,95 @@
+# This is a basic workflow to help you get started with Actions
+
+name: hg255d
+on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      ssh:
+        description: 'SSH connection to Actions'
+        required: false
+        default: 'false'
+
+jobs:
+
+  build_openwrt:
+
+    name: 自动编译hg255d固件
+
+    runs-on: ubuntu-16.04
+
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: main
+
+      - name: Space cleanup
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo -E apt-get update
+          sudo -E apt-get -y install g++ libncurses5-dev zlib1g-dev bison flex unzip autoconf gawk make gettext gcc binutils patch bzip2 libz-dev asciidoc subversion sphinxsearch libtool sphinx-common bash
+          sudo -E apt-get clean
+          sudo timedatectl set-timezone "Asia/Shanghai"
+          df -h
+          df -h
+
+      - name: Compile hg255d
+        run: |
+          bash compile-action.sh
+
+      - name: Prepare artifact
+        run: |
+          mkdir -p artifact/firmware
+          ls -lh
+          cp -rf $(find ./bin/ramips/ -type f -name "*sysupgrade.bin") ./artifact/firmware/
+
+      - name: Deliver firmware
+        uses: actions/upload-artifact@v2
+        with:
+          name: OpenWrt_firmware
+          path: ./artifact/firmware/
+
+      - name: Generate release tag
+        id: tag
+        run: |
+          echo "::set-output name=release_tag::$(date +"%Y.%m.%d-%H%M")"
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.tag.outputs.release_tag }}
+          release_name: Release ${{ steps.tag.outputs.release_tag }}
+          draft: false
+          prerelease: false
+          
+      - name: Upload firmware to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifact/firmware/openwrt-ramips-rt305x-hg255d-squashfs-sysupgrade.bin
+          asset_name: openwrt-ramips-rt305x-hg255d-squashfs-sysupgrade.bin
+          asset_content_type: application/bin
+
+      - name: Delete workflow runs
+        uses: GitRML/delete-workflow-runs@main
+        with:
+          retain_days: 1
+          keep_minimum_runs: 3
+
+      - name: Remove old Releases
+        uses: dev-drprasad/delete-older-releases@v0.1.0
+        with:
+          keep_latest: 3
+          delete_tags: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
