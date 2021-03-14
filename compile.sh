@@ -1,4 +1,7 @@
 #!/bin/bash
+if [ -d tmp ];then
+	rm -rf tmp && rm .config .config.old
+fi
 ./scripts/feeds update -a
 ./scripts/feeds install -a
 ./scripts/feeds install -a
