@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: hg255d
+name: test
 on:
   repository_dispatch:
   workflow_dispatch:
@@ -14,7 +14,7 @@ jobs:
 
   build_openwrt:
 
-    name: 自动编译hg255d固件
+    name: 自动编译hg255d固件test
 
     runs-on: ubuntu-16.04
 
@@ -27,26 +27,12 @@ jobs:
         with:
           ref: main
 
-      - name: Space cleanup
-        env:
-          DEBIAN_FRONTEND: noninteractive
-        run: |
-          sudo -E apt-get update
-          sudo -E apt-get -y install g++ libncurses5-dev zlib1g-dev bison flex unzip autoconf gawk make gettext gcc binutils patch bzip2 libz-dev asciidoc subversion sphinxsearch libtool sphinx-common bash
-          sudo -E apt-get clean
-          sudo timedatectl set-timezone "Asia/Shanghai"
-          df -h
-          df -h
-
-      - name: Compile hg255d
-        run: |
-          bash compile-action.sh
-
       - name: Prepare artifact
         run: |
           mkdir -p artifact/firmware
           ls -lh
-          cp -rf $(find ./bin/ramips/ -type f -name "*sysupgrade.bin") ./artifact/firmware/
+          touch ./artifact/firmware/openwrt-ramips-rt305x-hg255d-squashfs-sysupgrade.bin
+          echo "this is a test" > ./artifact/firmware/openwrt-ramips-rt305x-hg255d-squashfs-sysupgrade.bin
 
       - name: Deliver firmware
         uses: actions/upload-artifact@v2
