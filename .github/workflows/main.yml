@@ -71,7 +71,7 @@ jobs:
         with:
           tag_name: ${{ steps.tag.outputs.release_tag }}
           release_name: Release ${{ steps.tag.outputs.release_tag }}
-          body: release.txt
+          body: `cat release.txt`
           draft: false
           prerelease: false
           
