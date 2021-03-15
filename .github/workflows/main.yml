@@ -59,7 +59,9 @@ jobs:
         run: |
           echo "::set-output name=release_tag::$(date +"%Y.%m.%d-%H%M")"
           touch release.txt
-          echo "🔗 [美国线路](https://gh.con.sh/https://github.com/teasiu/hg255d/releases/download/${{ steps.tag.outputs.release_tag }}/openwrt-ramips-rt305x-hg255d-squashfs-sysupgrade.bin)" >> release.txt
+          echo "🔗 [美国线路加速下载1](https://gh.con.sh/https://github.com/teasiu/hg255d/releases/download/${{ steps.tag.outputs.release_tag }}/openwrt-ramips-rt305x-hg255d-squashfs-sysupgrade.bin)" >> release.txt
+          echo "🔗 [日本线路加速下载2](https://download.fastgit.org/teasiu/hg255d/releases/download/${{ steps.tag.outputs.release_tag }}/openwrt-ramips-rt305x-hg255d-squashfs-sysupgrade.bin)" >> release.txt
+          echo "🔗 [韩国线路加速下载3](https://ghproxy.com/https://github.com/teasiu/hg255d/releases/download/${{ steps.tag.outputs.release_tag }}/openwrt-ramips-rt305x-hg255d-squashfs-sysupgrade.bin)" >> release.txt
 
       - name: Create Release
         id: create_release
@@ -69,6 +71,7 @@ jobs:
         with:
           tag_name: ${{ steps.tag.outputs.release_tag }}
           release_name: Release ${{ steps.tag.outputs.release_tag }}
+          body: release.txt
           draft: false
           prerelease: false
           
@@ -80,7 +83,6 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./artifact/firmware/openwrt-ramips-rt305x-hg255d-squashfs-sysupgrade.bin
           asset_name: openwrt-ramips-rt305x-hg255d-squashfs-sysupgrade.bin
-          body_path: release.txt
           asset_content_type: application/bin
 
       - name: Delete workflow runs
