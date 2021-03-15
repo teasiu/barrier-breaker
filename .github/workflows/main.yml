@@ -58,10 +58,6 @@ jobs:
         id: tag
         run: |
           echo "::set-output name=release_tag::$(date +"%Y.%m.%d-%H%M")"
-          touch release.md
-          echo "🔗 [美国线路加速下载1](https://gh.con.sh/https://github.com/teasiu/hg255d/releases/download/${{ steps.tag.outputs.release_tag }}/openwrt-ramips-rt305x-hg255d-squashfs-sysupgrade.bin)" >> release.md
-          echo "🔗 [日本线路加速下载2](https://download.fastgit.org/teasiu/hg255d/releases/download/${{ steps.tag.outputs.release_tag }}/openwrt-ramips-rt305x-hg255d-squashfs-sysupgrade.bin)" >> release.md
-          echo "🔗 [韩国线路加速下载3](https://ghproxy.com/https://github.com/teasiu/hg255d/releases/download/${{ steps.tag.outputs.release_tag }}/openwrt-ramips-rt305x-hg255d-squashfs-sysupgrade.bin)" >> release.md
 
       - name: Create Release
         id: create_release
@@ -71,7 +67,9 @@ jobs:
         with:
           tag_name: ${{ steps.tag.outputs.release_tag }}
           release_name: Release ${{ steps.tag.outputs.release_tag }}
-          body: release.md
+          body: |🔗 [美国线路加速下载1](https://gh.con.sh/https://github.com/teasiu/hg255d/releases/download/${{ steps.tag.outputs.release_tag }}/openwrt-ramips-rt305x-hg255d-squashfs-sysupgrade.bin)
+            🔗 [日本线路加速下载2](https://download.fastgit.org/teasiu/hg255d/releases/download/${{ steps.tag.outputs.release_tag }}/openwrt-ramips-rt305x-hg255d-squashfs-sysupgrade.bin)
+            🔗 [韩国线路加速下载3](https://ghproxy.com/https://github.com/teasiu/hg255d/releases/download/${{ steps.tag.outputs.release_tag }}/openwrt-ramips-rt305x-hg255d-squashfs-sysupgrade.bin)
           draft: false
           prerelease: false
           
